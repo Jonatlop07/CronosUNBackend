@@ -14,8 +14,8 @@ public class JwtRequestDto implements Serializable {
     
     private static final long serialVersionUID = 5926468583005150707L;
 
-    @NotNull(message = "El Correo es obligatorio.")
-    private String correo;
+    @NotNull(message = "El alias es obligatorio.")
+    private String alias;
     
     @NotNull(message = "La clave es obligatoria.")
     private String clave;

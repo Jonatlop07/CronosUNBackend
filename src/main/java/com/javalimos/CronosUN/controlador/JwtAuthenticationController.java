@@ -29,18 +29,18 @@ public class JwtAuthenticationController {
     
     @RequestMapping(value = "/autenticacion", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtRequestDto authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getCorreo(), authenticationRequest.getClave());
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getCorreo());
+        authenticate(authenticationRequest.getAlias(), authenticationRequest.getClave());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getAlias());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        final Integer idUsuario = userDetailsService.cargarIdUsuario(authenticationRequest.getCorreo());
-        JwtResponseDto credenciales = new JwtResponseDto(token,idUsuario);
+        final Integer idUsuario = userDetailsService.cargarIdUsuario(authenticationRequest.getAlias());
+        JwtResponseDto credenciales = new JwtResponseDto(token, idUsuario);
 
         return ResponseEntity.ok(credenciales);
     }
 
-    private void authenticate(String correo, String password) throws Exception {
+    private void authenticate(String alias, String password) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(correo, password));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(alias, password));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

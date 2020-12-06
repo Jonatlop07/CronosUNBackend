@@ -40,6 +40,7 @@ public class DiarioServicio {
     }
     
     public List<EntradaDiarioDTO> obtenerEntradasDiario( FiltroEntradasDiarioDTO datosFiltro ) {
+        System.out.println(datosFiltro.getIdUsuario());
         Pageable paginacion = PageRequest.of( datosFiltro.getNumeroPagina(), TAMANIO_PAGINA );
         Page<EntradaDiario> resultadoEntradas = filtrarEntradasDiario( datosFiltro, paginacion );
         return obtenerResultadoFiltroEntradasDiario( resultadoEntradas );

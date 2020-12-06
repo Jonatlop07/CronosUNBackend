@@ -57,7 +57,7 @@ public class PortafolioServicio {
     }
     
     public List<ProyectoDTO> consultarPortafolioUsuario( String correo, Integer numeroPagina ) {
-        Usuario usuarioActual = usuarioRepository.findByCorreo( correo ).get();
+        Usuario usuarioActual = usuarioRepository.findByCorreo( correo );
         Pageable paginacion = PageRequest.of( numeroPagina, TAMANIO_PAGINA );
         Page<Proyecto> resultadoPortafolio = portafolioRepository.findByUsuario( usuarioActual, paginacion );
         return obtenerResultadoProyectosPortafolio( resultadoPortafolio );

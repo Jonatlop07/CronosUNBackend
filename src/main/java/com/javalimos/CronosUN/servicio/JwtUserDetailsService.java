@@ -17,19 +17,18 @@ public class JwtUserDetailsService implements UserDetailsService {
     private UsuarioRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-        Usuario userOption = repository.findByCorreo(correo);
-        if (!repository.existsByCorreo(correo)) {
-            throw new UsernameNotFoundException("Usuario no encontrado con correo: " + correo);
+    public UserDetails loadUserByUsername(String alias) throws UsernameNotFoundException {
+        Usuario userOption = repository.findByAlias(alias);
+        if (!repository.existsByAlias(alias)) {
+            throw new UsernameNotFoundException("Usuario no encontrado con alias: " + alias);
         }
         Usuario usuario = userOption;
-        System.out.println(usuario);
-        return new org.springframework.security.core.userdetails.User(usuario.getCorreo(),
+        return new org.springframework.security.core.userdetails.User(usuario.getAlias(),
                 usuario.getClave(), new ArrayList<>());
     }
-    public Integer cargarIdUsuario (String correo){
-        if(repository.existsByCorreo(correo)){
-            Usuario usuario = repository.findByCorreo(correo);
+    public Integer cargarIdUsuario (String alias){
+        if(repository.existsByAlias(alias)){
+            Usuario usuario = repository.findByAlias(alias);
             return usuario.getId();
         }
         return 0;

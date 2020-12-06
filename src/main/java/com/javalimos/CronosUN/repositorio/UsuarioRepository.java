@@ -9,4 +9,5 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Integer> {
     Usuario findByAlias(String alias);
     Usuario findByCorreo(String Correo);
     boolean existsByCorreo(String Correo);
+    boolean existsByAlias(String alias);
 }
