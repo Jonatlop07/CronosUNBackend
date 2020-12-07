@@ -65,6 +65,7 @@ public class PortafolioServicio {
     
     public ProyectoDTO registrarProyectoPortafolio( ProyectoDTO nuevoProyecto ) {
         Usuario usuarioActual = usuarioRepository.findById( nuevoProyecto.getIdUsuario() ).get();
+        System.out.println(usuarioActual);
         Proyecto proyecto = mapeadorProyecto.toProyecto( nuevoProyecto );
         proyecto.setUsuario( usuarioActual );
         ProyectoDTO proyectoRegistrado = mapeadorProyecto.toProyectoDTO( portafolioRepository.save( proyecto ) );
@@ -96,7 +97,6 @@ public class PortafolioServicio {
     }
     
     public ProyectoDTO actualizarProyectoPortafolio( ProyectoDTO proyectoEditado ) {
-        proyectoEditado.setId( proyectoEditado.getId() );
         return registrarProyectoPortafolio( proyectoEditado );
     }
     
