@@ -4,19 +4,18 @@ import com.javalimos.CronosUN.dto.RegistroUsuarioDTO;
 import com.javalimos.CronosUN.mapeador.MapeadorUsuario;
 import com.javalimos.CronosUN.modelo.Usuario;
 import com.javalimos.CronosUN.repositorio.UsuarioRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class InformacionUsuarioServicio {
-
-    @Autowired
-    private MapeadorUsuario mapeador;
-
-    @Autowired
-    private UsuarioRepository repositorio;
+    
+    private final MapeadorUsuario mapeador;
+    private final UsuarioRepository repositorio;
 
     public RegistroUsuarioDTO obtenerInformacionUsuario( Integer id ) {
 
@@ -26,9 +25,10 @@ public class InformacionUsuarioServicio {
         return respuestaUsuario;
     }
 
-    public RegistroUsuarioDTO modificarUsuario(RegistroUsuarioDTO usuario){
+    @Transactional
+    public RegistroUsuarioDTO modificarUsuario(Integer idUsuario, RegistroUsuarioDTO usuario){
 
-        Usuario usuarioActual = repositorio.findById( usuario.getId() ).get();
+        Usuario usuarioActual = repositorio.findById( idUsuario ).get();
 
         usuarioActual.setNombre(usuario.getNombre());
         usuarioActual.setAlias(usuario.getAlias());
@@ -42,6 +42,7 @@ public class InformacionUsuarioServicio {
 
     }
 
+    @Transactional
     public boolean eliminarUsuario(Integer idUsuario){
         if(repositorio.existsById(idUsuario)){
             repositorio.deleteById(idUsuario);

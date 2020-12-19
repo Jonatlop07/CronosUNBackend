@@ -21,7 +21,4 @@ public class OpcionAsignaturaDTO {
     
     @NotNull
     private List<OpcionGrupoDTO> grupos;
-
-    @NotNull
-    private Integer idUsuario;
 }

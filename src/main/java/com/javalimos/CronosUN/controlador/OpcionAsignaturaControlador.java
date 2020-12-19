@@ -1,41 +1,46 @@
 package com.javalimos.CronosUN.controlador;
 
+import com.javalimos.CronosUN.constante.MensajesDeRespuesta;
 import com.javalimos.CronosUN.dto.AsignaturaDTO;
 import com.javalimos.CronosUN.dto.OpcionAsignaturaDTO;
 import com.javalimos.CronosUN.servicio.OpcionAsignaturaServicio;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import com.javalimos.CronosUN.constante.RutasApi;
 
 import javax.validation.Valid;
 import java.util.List;
 
 
 @RestController
-@CrossOrigin (origins = "http://localhost:3000")
+@RequestMapping( "/api/v2/usuario/{id}/opcionesAsignatura" )
+@AllArgsConstructor
 public class OpcionAsignaturaControlador {
+    
     private final OpcionAsignaturaServicio servicio;
-    public OpcionAsignaturaControlador (OpcionAsignaturaServicio servicio)   {this.servicio=servicio;}
-
-    @PostMapping (RutasApi.REGISTRO_OPCION_ASIGNATURA)
+    
+    @PostMapping( "/registro" )
     public ResponseEntity<?> realizarRegistroAsignaturaOpcion(
-            @Valid @RequestBody OpcionAsignaturaDTO opcionAsignaturaDTO){
-            Integer idUsuario = servicio.realizarRegistroAsignaturaOpcion(opcionAsignaturaDTO);
-            return ResponseEntity.ok(idUsuario);
+            @Valid @PathVariable( "id" ) Integer idUsuario,
+            @Valid @RequestBody OpcionAsignaturaDTO opcionAsignaturaDTO ) {
+        servicio.realizarRegistroAsignaturaOpcion( idUsuario, opcionAsignaturaDTO );
+        return new ResponseEntity<>( MensajesDeRespuesta.OPCION_ASIGNATURA_REGISTRADA, HttpStatus.CREATED );
     }
-    @GetMapping ( RutasApi.OPCIONES_ASIGNATURAS )
-    public ResponseEntity<?> obtenerOpcionesAsignatura(
-            @Valid @RequestParam Integer idUsuario){
-        List<AsignaturaDTO> opcionesAsignatura = servicio.obtenerOpcionesAsignatura(idUsuario);
-        return ResponseEntity.ok(opcionesAsignatura);
+    
+    @GetMapping
+    public ResponseEntity<List<AsignaturaDTO>> obtenerOpcionesAsignatura(
+            @Valid @PathVariable( "id" ) Integer idUsuario ) {
+        List<AsignaturaDTO> opcionesAsignatura = servicio.obtenerOpcionesAsignatura( idUsuario );
+        return ResponseEntity.ok( opcionesAsignatura );
     }
-    @DeleteMapping (RutasApi.RESTABLECER_OPCION_ASIGNATURA)
+    
+    @DeleteMapping
     public ResponseEntity<?> restablecerAsignaturaOpcion(
-            @Valid @RequestParam Integer idUsuario){
-        Integer respuesta = servicio.restablecerAsignaturaOpcion(idUsuario);
-        return ResponseEntity.ok(respuesta);
+            @Valid @PathVariable Integer idUsuario ) {
+        Integer respuesta = servicio.restablecerAsignaturaOpcion( idUsuario );
+        return ResponseEntity.ok( respuesta );
     }
 }
 

@@ -1,72 +1,71 @@
 package com.javalimos.CronosUN.controlador;
 
-import com.javalimos.CronosUN.constante.RutasApi;
-import com.javalimos.CronosUN.dto.FiltroProyectosPortafolioDTO;
-import com.javalimos.CronosUN.dto.ProyectoDTO;
+import com.javalimos.CronosUN.dto.*;
 import com.javalimos.CronosUN.servicio.PortafolioServicio;
-import org.springframework.http.HttpStatus;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.PROYECTO_ELIMINADO;
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.PROYECTO_REGISTRADO;
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.PROYECTO_ACTUALIZADO;
+import static org.springframework.http.HttpStatus.*;
+
 @RestController
+@RequestMapping( "/api/v2/usuario/{id}/portafolio/proyectos" )
+@AllArgsConstructor
 public class PortafolioControlador {
     
-    private PortafolioServicio portafolioServicio;
+    private final PortafolioServicio portafolioServicio;
     
-    public PortafolioControlador( PortafolioServicio portafolioServicio ) {
-        this.portafolioServicio = portafolioServicio;
+    @GetMapping( "/{idProyecto}" )
+    public ResponseEntity<ProyectoDTO> consultarProyectoPortafolio( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                                    @NotNull @PathVariable( "idProyecto" ) Integer idProyecto ) {
+        ProyectoDTO proyectoConsultado = portafolioServicio.consultarProyectoPortafolio( idUsuario, idProyecto );
+        return new ResponseEntity<>( proyectoConsultado, OK );
     }
     
-    @GetMapping( RutasApi.PROYECTO )
-    public ResponseEntity<ProyectoDTO> consultarProyectoPortafolio( @PathVariable( "id" ) Integer idProyecto ) {
-        ProyectoDTO proyectoConsultado = portafolioServicio.consultarProyectoPortafolio( idProyecto );
-        return ResponseEntity.ok( proyectoConsultado );
+    @PostMapping
+    public ResponseEntity<RespuestaFiltroProyectos> obtenerProyectosPortafolio( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                                                @RequestBody( required = false ) DatosFiltroProyectos datosFiltro ) {
+        RespuestaFiltroProyectos respuestFiltroProyectos = portafolioServicio.obtenerProyectosPortafolio( idUsuario, datosFiltro );
+        return ResponseEntity.ok( respuestFiltroProyectos );
     }
     
-    @GetMapping( RutasApi.CATEGORIAS_PORTAFOLIO )
-    public ResponseEntity<List<String>> consultarCategoriasPortafolio( @PathVariable( "id" ) Integer idUsuario ) {
+    @PostMapping( "/registro" )
+    public ResponseEntity<?> registrarProyectoPortafolio( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                          @NotNull @RequestBody ProyectoDTO nuevoProyecto ) {
+        ProyectoDTO proyectoGuardado = portafolioServicio.registrarProyectoPortafolio( idUsuario, nuevoProyecto );
+        return new ResponseEntity<>( PROYECTO_REGISTRADO, CREATED );
+    }
+    
+    @PutMapping
+    public ResponseEntity<?> actualizarProyectoPortafolio( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                           @NotNull @RequestBody ProyectoDTO proyectoEditado ) {
+        portafolioServicio.actualizarProyectoPortafolio( idUsuario, proyectoEditado );
+        return new ResponseEntity<>( PROYECTO_ACTUALIZADO, NO_CONTENT );
+    }
+    
+    @DeleteMapping( "/{idProyecto}" )
+    public ResponseEntity<?> eliminarProyectoPortafolio( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                         @NotNull @PathVariable( "idProyecto" ) Integer idProyecto ) {
+        portafolioServicio.eliminarProyectoPortafolio( idUsuario, idProyecto );
+        return new ResponseEntity<>( PROYECTO_ELIMINADO, NO_CONTENT );
+    }
+    
+    @GetMapping( "/categorias" )
+    public ResponseEntity<List<String>> consultarCategoriasPortafolio( @NotNull @PathVariable( "id" ) Integer idUsuario ) {
         List<String> categoriasPortafolio = portafolioServicio.consultarCategoriasPortafolio( idUsuario );
         return ResponseEntity.ok( categoriasPortafolio );
     }
     
-    @GetMapping( RutasApi.NUM_PAGINAS_PORTAFOLIO )
-    public ResponseEntity<Integer> consultarNumeroPaginasPortafolio( @Valid @RequestParam Integer idUsuario ) {
-        Integer numeroPaginas = portafolioServicio.consultarNumeroPaginasPortafolio( idUsuario );
-        return ResponseEntity.ok( numeroPaginas );
-    }
-    
-    @GetMapping( RutasApi.CONSULTA_PORTAFOLIO_USUARIO )
-    public ResponseEntity<List<ProyectoDTO>> consultarPortafolioUsuario( @RequestParam String correo, @RequestParam Integer numeroPagina ) {
-        List<ProyectoDTO> proyectosPortafolio = portafolioServicio.consultarPortafolioUsuario( correo, numeroPagina );
-        return ResponseEntity.ok( proyectosPortafolio );
-    }
-    
-    @PostMapping( RutasApi.REGISTRO_PROYECTO )
-    public ResponseEntity<ProyectoDTO> registrarProyectoPortafolio( @Valid @RequestBody ProyectoDTO nuevoProyecto ) {
-        ProyectoDTO proyectoGuardado = portafolioServicio.registrarProyectoPortafolio( nuevoProyecto );
-        return ResponseEntity.ok( proyectoGuardado );
-    }
-    
-    @PostMapping( RutasApi.FILTRO_PROYECTOS )
-    public ResponseEntity<List<ProyectoDTO>> obtenerProyectosPortafolio( @Valid @RequestBody FiltroProyectosPortafolioDTO datosFiltro ) {
-        List<ProyectoDTO> proyectos = portafolioServicio.obtenerProyectosPortafolio( datosFiltro );
-        return ResponseEntity.ok( proyectos );
-    }
-    
-    @PutMapping( RutasApi.ACTUALIZACION_PROYECTO )
-    public ResponseEntity<ProyectoDTO> actualizarProyectoPortafolio( @RequestBody ProyectoDTO proyectoEditado ) {
-        ProyectoDTO proyectoActualizado = portafolioServicio.actualizarProyectoPortafolio( proyectoEditado );
-        return ResponseEntity.ok( proyectoActualizado );
-    }
-    
-    @DeleteMapping( RutasApi.PROYECTO )
-    public ResponseEntity<?> eliminarProyectoPortafolio( @PathVariable( "id" ) Integer idProyecto ) {
-        if ( portafolioServicio.eliminarProyectoPortafolio( idProyecto ) ) {
-            return new ResponseEntity<>( HttpStatus.OK );
-        }
-        return new ResponseEntity<>( HttpStatus.NOT_ACCEPTABLE );
+    @PostMapping( "/publicos" )
+    public ResponseEntity<RespuestaPortafolioUsuario> consultarPortafolioUsuario( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                                                  @NotNull @RequestBody PeticionPortafolioDTO peticionPortafolioDTO ) {
+        RespuestaPortafolioUsuario respuestaPortafolioUsuario = portafolioServicio.consultarPortafolioUsuario( idUsuario, peticionPortafolioDTO );
+        return ResponseEntity.ok( respuestaPortafolioUsuario );
     }
 }

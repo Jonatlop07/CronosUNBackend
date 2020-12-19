@@ -29,7 +29,4 @@ public class EntradaDiarioDTO {
     
     @NotBlank
     private String contenido;
-    
-    @NotNull
-    private Integer idUsuario;
 }

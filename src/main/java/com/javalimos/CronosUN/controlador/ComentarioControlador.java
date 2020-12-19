@@ -1,42 +1,44 @@
 package com.javalimos.CronosUN.controlador;
 
-import com.javalimos.CronosUN.constante.RutasApi;
 import com.javalimos.CronosUN.dto.ComentarioDTO;
 import com.javalimos.CronosUN.servicio.ComentarioServicio;
-import org.springframework.http.HttpStatus;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@CrossOrigin( origins = "http://localhost:3000" )
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.COMENTARIO_ELIMINADO;
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.COMENTARIO_REGISTRADO;
+import static org.springframework.http.HttpStatus.*;
+
 @RestController
+@RequestMapping( "/api/v2/usuario/{id}/portafolio/proyectos/{idProyecto}/comentarios" )
+@AllArgsConstructor
 public class ComentarioControlador {
     
-    private ComentarioServicio comentarioServicio;
+    private final ComentarioServicio comentarioServicio;
     
-    public ComentarioControlador( ComentarioServicio comentarioServicio ) {
-        this.comentarioServicio = comentarioServicio;
-    }
-    
-    @GetMapping( RutasApi.COMENTARIOS_PROYECTO )
-    public ResponseEntity<List<ComentarioDTO>> obtenerComentariosProyecto( @RequestParam Integer idProyecto ) {
-        List<ComentarioDTO> comentariosProyecto = comentarioServicio.obtenerComentariosProyecto( idProyecto );
+    @GetMapping
+    public ResponseEntity<List<ComentarioDTO>> obtenerComentariosProyecto( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                                           @NotNull @PathVariable( "idProyecto" ) Integer idProyecto ) {
+        List<ComentarioDTO> comentariosProyecto = comentarioServicio.obtenerComentariosProyecto( idUsuario, idProyecto );
         return ResponseEntity.ok( comentariosProyecto );
     }
     
-    @PostMapping( RutasApi.REGISTRO_COMENTARIO )
-    public ResponseEntity<ComentarioDTO> registrarComentario( @Valid @RequestBody ComentarioDTO nuevoComentarioDTO ) {
-        ComentarioDTO comentarioRegistrado = comentarioServicio.registrarComentario( nuevoComentarioDTO );
-        return ResponseEntity.ok( comentarioRegistrado );
+    @PostMapping
+    public ResponseEntity<?> registrarComentario( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                  @NotNull @PathVariable( "idProyecto" ) Integer idProyecto,
+                                                  @NotNull @RequestBody ComentarioDTO nuevoComentarioDTO ) {
+        comentarioServicio.registrarComentario( idUsuario, idProyecto, nuevoComentarioDTO );
+        return new ResponseEntity<>( COMENTARIO_REGISTRADO, CREATED );
     }
     
-    @DeleteMapping( RutasApi.COMENTARIO )
-    public ResponseEntity<?> eliminarComentario( @PathVariable("id") Integer idComentario ) {
-        if ( comentarioServicio.eliminarComentario( idComentario ) ) {
-            return new ResponseEntity<>( HttpStatus.OK );
-        }
-        return new ResponseEntity<>( HttpStatus.NOT_ACCEPTABLE );
+    @DeleteMapping( "/{idComentario}" )
+    public ResponseEntity<?> eliminarComentario( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                 @NotNull @PathVariable( "idComentario" ) Integer idComentario ) {
+        comentarioServicio.eliminarComentario( idUsuario, idComentario );
+        return new ResponseEntity<>( COMENTARIO_ELIMINADO, NO_CONTENT );
     }
 }

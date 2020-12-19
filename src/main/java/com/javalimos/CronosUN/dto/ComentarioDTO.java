@@ -19,6 +19,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComentarioDTO {
+    
     private Integer id;
     
     private String nombreUsuario;
@@ -40,7 +41,4 @@ public class ComentarioDTO {
     
     @NotNull
     private Integer idProyecto;
-    
-    @NotNull
-    private Integer idUsuario;
 }

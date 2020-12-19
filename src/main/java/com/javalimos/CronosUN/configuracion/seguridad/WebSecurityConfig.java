@@ -21,49 +21,50 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity( prePostEnabled = true )
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
+    
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
+    
     @Autowired
     private UserDetailsService jwtUserDetailsService;
-
+    
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
-
+    
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+    public void configureGlobal( AuthenticationManagerBuilder auth ) throws Exception {
+        auth.userDetailsService( jwtUserDetailsService ).passwordEncoder( passwordEncoder() );
     }
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+    
     @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors().configurationSource(request -> {
+    protected void configure( HttpSecurity httpSecurity ) throws Exception {
+        httpSecurity.cors().configurationSource( request -> {
             CorsConfiguration cors = new CorsConfiguration();
-            cors.setAllowedOrigins(List.of("http://localhost:3000"));
-            cors.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
-            cors.setAllowedHeaders(List.of("*"));
+            cors.setAllowedOrigins( List.of( "http://localhost:3000" ) );
+            cors.setAllowedMethods( List.of( "GET", "POST", "PUT", "DELETE", "OPTIONS" ) );
+            cors.setAllowedHeaders( List.of( "*" ) );
             return cors;
-        });
+        } );
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/autenticacion", "/registro").permitAll().
-                anyRequest().authenticated().and().
-                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeRequests()
+                .antMatchers( "/api/v2/auth/autenticacion", "/api/v2/auth/registro", "/api/v2/usuario/recuperarClave" ).permitAll()
+                .anyRequest().authenticated().and()
+                .exceptionHandling().authenticationEntryPoint( jwtAuthenticationEntryPoint ).and().sessionManagement()
+                .sessionCreationPolicy( SessionCreationPolicy.STATELESS );
+        httpSecurity.addFilterBefore( jwtRequestFilter, UsernamePasswordAuthenticationFilter.class );
     }
-
+    
 }

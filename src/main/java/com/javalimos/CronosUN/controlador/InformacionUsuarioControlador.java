@@ -1,42 +1,41 @@
 package com.javalimos.CronosUN.controlador;
 
-import com.javalimos.CronosUN.constante.RutasApi;
 import com.javalimos.CronosUN.dto.RegistroUsuarioDTO;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
 import com.javalimos.CronosUN.servicio.InformacionUsuarioServicio;
-import javax.validation.Valid;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
-@CrossOrigin (origins = "http://localhost:3000")
+@RequestMapping( "/api/v2/usuario/{id}/cuenta" )
+@AllArgsConstructor
 public class InformacionUsuarioControlador {
-
+    
     private final InformacionUsuarioServicio servicio;
-
-    public InformacionUsuarioControlador (InformacionUsuarioServicio servicio) {
-        this.servicio = servicio;
-    }
-
-    @GetMapping( RutasApi.INFORMACION_USUARIO )
+    
+    @GetMapping
     public ResponseEntity<?> obtenerInformacionUsuario(
-            @Valid @RequestParam Integer id ) {
-        RegistroUsuarioDTO idUsuario = servicio.obtenerInformacionUsuario( id );
-        return ResponseEntity.ok(idUsuario);
+            @PathVariable( "id" ) Integer idUsuario ) {
+        RegistroUsuarioDTO usuarioDTO = servicio.obtenerInformacionUsuario( idUsuario );
+        return ResponseEntity.ok( usuarioDTO );
     }
-    @PutMapping( RutasApi.MODIFICAR_USUARIO )
+    
+    @PutMapping
     public ResponseEntity<?> modificarUsuario(
-            @Valid @RequestBody RegistroUsuarioDTO usuarioDTO ) {
-        RegistroUsuarioDTO UsuarioModificado = servicio.modificarUsuario( usuarioDTO );
-        return ResponseEntity.ok(UsuarioModificado);
+            @PathVariable( "id" ) Integer idUsuario, @RequestBody RegistroUsuarioDTO usuarioDTO ) {
+        RegistroUsuarioDTO usuarioModificado = servicio.modificarUsuario( idUsuario, usuarioDTO );
+        return ResponseEntity.ok( usuarioModificado );
     }
-    @DeleteMapping( RutasApi.ELIMINAR_USUARIO )
+    
+    @DeleteMapping
     public ResponseEntity<?> eliminarUsuario(
-            @Valid @RequestParam Integer id) {
-        if ( servicio.eliminarUsuario( id) ) {
-            return new ResponseEntity<>( HttpStatus.OK );
+            @PathVariable( "id" ) Integer idUsuario ) {
+        if ( servicio.eliminarUsuario( idUsuario ) ) {
+            return new ResponseEntity<>( OK );
         }
-        return new ResponseEntity<>( HttpStatus.NOT_ACCEPTABLE );
+        return new ResponseEntity<>( NOT_ACCEPTABLE );
     }
-
+    
 }

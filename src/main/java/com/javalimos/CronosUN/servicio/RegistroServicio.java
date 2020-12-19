@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +23,11 @@ public class RegistroServicio {
     
     private final UsuarioRepository repositorio;
     
-    public Integer realizarRegistroUsuario( RegistroUsuarioDTO usuario){
+    @Transactional
+    public void realizarRegistroUsuario( RegistroUsuarioDTO usuario){
         Usuario usuarioEntidad = mapeador.toUsuario(usuario);
         usuarioEntidad.setClave(bcryptEncoder.encode(usuario.getClave()));
-        Usuario usuarioGuardado = repositorio.save(usuarioEntidad);
-        return usuarioGuardado.getId();
+        repositorio.save(usuarioEntidad);
     }
     
 

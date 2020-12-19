@@ -14,8 +14,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProyectoDTO {
-    @NotNull
-    private Integer idUsuario;
     
     private Integer id;
     

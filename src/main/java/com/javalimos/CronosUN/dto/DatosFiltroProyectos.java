@@ -6,18 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FiltroProyectosPortafolioDTO {
-    @NotNull
-    private Integer idUsuario;
+public class DatosFiltroProyectos {
     
     private int numeroPagina = 0;
+    
+    private int tamanioPagina = 10;
     
     private String titulo;
     

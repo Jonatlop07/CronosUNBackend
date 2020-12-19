@@ -12,6 +12,6 @@ public class JwtResponseDto implements Serializable {
     
     private final String jwttoken;
 
-    private final Integer idUsuario;
+    private final UsuarioDTO usuario;
 
 }

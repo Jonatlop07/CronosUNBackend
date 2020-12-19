@@ -1,53 +1,46 @@
 package com.javalimos.CronosUN.controlador;
 
-import com.javalimos.CronosUN.constante.RutasApi;
 
 import com.javalimos.CronosUN.dto.EntradaDiarioDTO;
-import com.javalimos.CronosUN.dto.FiltroEntradasDiarioDTO;
+import com.javalimos.CronosUN.dto.DatosFiltroEntradasDiario;
+import com.javalimos.CronosUN.dto.RespuestaFiltroEntradas;
 import com.javalimos.CronosUN.servicio.DiarioServicio;
-
-import org.springframework.http.HttpStatus;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
-@CrossOrigin( origins = "http://localhost:3000" )
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.ENTRADA_ELIMINADA;
+import static com.javalimos.CronosUN.constante.MensajesDeRespuesta.ENTRADA_REGISTRADA;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 @RestController
+@RequestMapping( "/api/v2/usuario/{id}/portafolio/diario" )
+@AllArgsConstructor
 public class DiarioControlador {
     
-    private DiarioServicio diarioServicio;
+    private final DiarioServicio diarioServicio;
     
-    public DiarioControlador( DiarioServicio diarioServicio ) {
-        this.diarioServicio = diarioServicio;
+    @PostMapping( "/registro" )
+    public ResponseEntity<?> registrarEntradaDiario( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                     @NotNull @RequestBody EntradaDiarioDTO nuevaEntradaDiario ) {
+        diarioServicio.registrarEntradaDiario( idUsuario, nuevaEntradaDiario );
+        return new ResponseEntity<>( ENTRADA_REGISTRADA, OK );
     }
     
-    @GetMapping( RutasApi.NUM_PAGINAS_DIARIO )
-    public ResponseEntity<Integer> consultarNumeroPaginasDiario( @Valid @RequestParam Integer idUsuario ) {
-        Integer numeroPaginas = diarioServicio.consultarNumeroPaginasDiario( idUsuario );
-        return ResponseEntity.ok( numeroPaginas );
+    @PostMapping
+    public ResponseEntity<RespuestaFiltroEntradas> obtenerEntradasDiario( @NotNull @PathVariable( "id" ) Integer idUsuario,
+                                                                          @RequestBody( required = false ) DatosFiltroEntradasDiario datosFiltro ) {
+        RespuestaFiltroEntradas respuestaFiltroEntradas = diarioServicio.obtenerEntradasDiario( idUsuario, datosFiltro );
+        return new ResponseEntity<>( respuestaFiltroEntradas, OK );
     }
     
-    @PostMapping( RutasApi.REGISTRO_DIARIO )
-    public ResponseEntity<EntradaDiarioDTO> registrarEntradaDiario( @Valid @RequestBody EntradaDiarioDTO nuevaEntradaDiario ) {
-        EntradaDiarioDTO entradaGuardada = diarioServicio.registrarEntradaDiario( nuevaEntradaDiario );
-        return ResponseEntity.ok( entradaGuardada );
-    }
-    
-    @PostMapping( RutasApi.FILTRO_ENTRADAS )
-    public ResponseEntity<List<EntradaDiarioDTO>> obtenerEntradasDiario( @Valid @RequestBody FiltroEntradasDiarioDTO datosFiltro ) {
-        List<EntradaDiarioDTO> entradasDiario = diarioServicio.obtenerEntradasDiario( datosFiltro );
-        
-        return ResponseEntity.ok( entradasDiario );
-    }
-    
-    @DeleteMapping( RutasApi.ENTRADA_DIARIO )
-    public ResponseEntity<?> eliminarEntradaDiario( @PathVariable( "id" ) Integer idEntrada ) {
-        if ( diarioServicio.eliminarEntradaDiario( idEntrada ) ) {
-            return new ResponseEntity<>( HttpStatus.OK );
-        }
-        return new ResponseEntity<>( HttpStatus.NOT_ACCEPTABLE );
+    @DeleteMapping( "/{idEntrada}" )
+    public ResponseEntity<?> eliminarEntradaDiario( @PathVariable( "id" ) Integer idUsuario,
+                                                    @NotNull @PathVariable( "idEntrada" ) Integer idEntrada ) {
+        diarioServicio.eliminarEntradaDiario( idUsuario, idEntrada );
+        return new ResponseEntity<>( ENTRADA_ELIMINADA, NO_CONTENT );
     }
 }

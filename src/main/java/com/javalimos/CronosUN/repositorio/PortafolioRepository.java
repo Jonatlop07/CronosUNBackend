@@ -14,8 +14,10 @@ import java.util.Optional;
 
 @Repository
 public interface PortafolioRepository extends PagingAndSortingRepository<Proyecto, Integer> {
-    Page<Proyecto> findAll( Specification<Proyecto> especificacion, Pageable paginacion );
-
+    Optional<Proyecto> findByIdAndUsuario( Integer id, Usuario usuario );
+    
+    Page<Proyecto> findAll( Specification<Proyecto> especificacionProyecto, Pageable paginacion );
+    
     Page<Proyecto> findByUsuario( Usuario usuario, Pageable paginacion );
     
     List<ICategoria> findDistinctCategoriasByUsuario( Usuario usuario );

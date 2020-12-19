@@ -9,9 +9,11 @@ import com.javalimos.CronosUN.modelo.Grupo;
 import com.javalimos.CronosUN.modelo.Usuario;
 import com.javalimos.CronosUN.repositorio.AsignaturaOpcionRepository;
 import com.javalimos.CronosUN.repositorio.UsuarioRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,24 +21,23 @@ import java.util.Scanner;
 
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class OpcionAsignaturaServicio {
-    @Autowired
+    
     private final MapeadorOpcionAsignatura mapeador;
-
-    @Autowired
     private final AsignaturaOpcionRepository opcionAsignaturaRepositorio;
-
-    @Autowired
     private final UsuarioRepository usuarioRepositorio;
+    
+    @Transactional
     public Integer restablecerAsignaturaOpcion(Integer idUsuario){
         Usuario usuarioactual = usuarioRepositorio.findById(idUsuario).get();
         opcionAsignaturaRepositorio.deleteByUsuario(usuarioactual);
         return usuarioactual.getId();
     }
 
-    public Integer realizarRegistroAsignaturaOpcion (OpcionAsignaturaDTO opcionAsignatura){
-        Usuario usuarioactual = usuarioRepositorio.findById(opcionAsignatura.getIdUsuario()).get();
+    @Transactional
+    public void realizarRegistroAsignaturaOpcion (Integer idUsuario, OpcionAsignaturaDTO opcionAsignatura){
+        Usuario usuarioactual = usuarioRepositorio.findById(idUsuario).get();
         AsignaturaOpcion asignaturaOpcionEntidad = mapeador.toAsignaturaOpcion(opcionAsignatura);
         List<Grupo> gruposEntidad = asignaturaOpcionEntidad.getGrupos();
         for (Grupo g : gruposEntidad){
@@ -45,8 +46,8 @@ public class OpcionAsignaturaServicio {
         asignaturaOpcionEntidad.setUsuario(usuarioactual);
         usuarioactual.getAsignaturasOpcion().add(asignaturaOpcionEntidad);
         Usuario usuarioGuardado = usuarioRepositorio.save(usuarioactual);
-        return usuarioGuardado.getId();
     }
+    
     public List<AsignaturaDTO> obtenerOpcionesAsignatura (Integer idUsuario){
         Usuario usuarioActual = usuarioRepositorio.findById(idUsuario).get();
         List<AsignaturaOpcion> asignaturasOpcion = opcionAsignaturaRepositorio.findByUsuario(usuarioActual);
